@@ -1,15 +1,16 @@
 = SEC DataGrinder
 
-This application downloads corporate ownership data from the SEC's Edgar web app and processes it into summaries by company.
-
-Here's what all it does:
+This application downloads corporate ownership data from the SEC's Edgar web app and processes it into summaries by company. It also associates the ownership data with political donations and lobbying data from http://opensecrets.org.
 
 === SEC:
 
-1. Downloads list of all forms submitted to the SEC starting at 1990
+1. Downloads list of all forms submitted to the SEC starting at 1990 from the SEC's EDGAR:
+
+https://www.sec.gov/edgar/searchedgar/legacy/companysearch.html
+
 2. Download all corporate ownership-related forms (SEC form SC-13D, SC-13G, 3, 4 and 5) for a given year range
 3. Process forms into 'major owners' (SC-13D, SC-13G) and 'direct owners' (3, 4, 5)
-4. Process major and direct owner tables into a unified summary in MySQL
+4. Process major and direct owner tables into a unified corporate ownership summary in MySQL
 
 === OpenSecrets:
 
@@ -22,6 +23,8 @@ https://www.opensecrets.org/MyOS/bulk.php
 Imports company subsidiaries data into MySQL:
 
 http://api.corpwatch.org/documentation/db_dump/
+
+These 3 databases are then linked: corporate ownership plus campaign finance data along with lists of each company's subsidiaries.
 
 == Installation
 
