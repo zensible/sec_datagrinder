@@ -4,13 +4,13 @@ This application downloads corporate ownership data from the SEC's Edgar web app
 
 ### SEC:
 
-1. Downloads list of all forms submitted to the SEC starting at 1990 from the SEC's EDGAR:
+- Downloads list of all forms submitted to the SEC starting at 1990 from the SEC's EDGAR:
 
 https://www.sec.gov/edgar/searchedgar/legacy/companysearch.html
 
-2. Download all corporate ownership-related forms (SEC form SC-13D, SC-13G, 3, 4 and 5) for a given year range
-3. Process forms into 'major owners' (SC-13D, SC-13G) and 'direct owners' (3, 4, 5)
-4. Process major and direct owner tables into a unified corporate ownership summary in MySQL
+- Download all corporate ownership-related forms (SEC form SC-13D, SC-13G, 3, 4 and 5) for a given year range
+- Process forms into 'major owners' (SC-13D, SC-13G) and 'direct owners' (3, 4, 5)
+- Process major and direct owner tables into a unified corporate ownership summary in MySQL
 
 ### OpenSecrets:
 
@@ -39,12 +39,12 @@ http://www.sequelpro.com/download
 http://app.robomongo.org/download.html
 ```
 
-1. Install mysql. Any version should work, author used 5.5: https://dev.mysql.com/downloads/mysql/
-2. Install mongodb, author used 3.0.8: https://www.mongodb.org/downloads#production
+- Install mysql. Any version should work, author used 5.5: https://dev.mysql.com/downloads/mysql/
+- Install mongodb, author used 3.0.8: https://www.mongodb.org/downloads#production
 
 Make sure you have *plenty* of hard drive space available wherever you install mysql/mongodb, I'd budget at least 200gb if you're processing all the available data.  The more RAM you have the faster it will go, 16GB is probably the bare minimum.
 
-3. Create DBs, start Rails
+- Create DBs, start Rails
 
 ```
 bundle install
@@ -124,9 +124,9 @@ Now we move on to campaign finance
 
 This must be run three times, specifying a different set of tables to import each time:
 
-1. 527
-2. lobby
-3. campaign
+- 527
+- lobby
+- campaign
 
 ### OS.2: rake sec:populate_os_summary_donor
 
@@ -142,11 +142,11 @@ Follow the instructions herein to export the summary data and import it on anoth
 
 # Methodology:
 
-1. Read in Edgar's 'index' files to create the 'forms' MongoDB collection
-2. For each form, download the text data into the forms.txt field
-3. Process each form, extracting owners
-4. Create ownership 'summary' entries in MySQL for each company and owner
-5. Populate summaries using owner tables
+- Read in Edgar's 'index' files to create the 'forms' MongoDB collection
+- For each form, download the text data into the forms.txt field
+- Process each form, extracting owners
+- Create ownership 'summary' entries in MySQL for each company and owner
+- Populate summaries using owner tables
 
 ## Anticipated questions:
 
