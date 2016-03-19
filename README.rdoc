@@ -4,8 +4,24 @@ This application downloads corporate ownership data from the SEC's Edgar web app
 
 Here's what all it does:
 
+=== SEC:
+
 1. Downloads list of all forms submitted to the SEC starting at 1990
-2. Download all ownership forms (SEC form SC-13D, SC-13G, 3, 4 and 5)
+2. Download all corporate ownership-related forms (SEC form SC-13D, SC-13G, 3, 4 and 5) for a given year range
+3. Process forms into 'major owners' (SC-13D, SC-13G) and 'direct owners' (3, 4, 5)
+4. Process major and direct owner tables into a unified summary in MySQL
+
+=== OpenSecrets:
+
+Imports 527, lobbying and campaign data into MySQL:
+
+https://www.opensecrets.org/MyOS/bulk.php
+
+=== CorpWatch:
+
+Imports company subsidiaries data into MySQL:
+
+http://api.corpwatch.org/documentation/db_dump/
 
 == Installation
 
