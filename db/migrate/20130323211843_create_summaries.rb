@@ -4,6 +4,7 @@ class CreateSummaries < ActiveRecord::Migration
       t.integer :cik
       t.string :irs_number
       t.integer :subtype
+      t.integer :cw_id
       t.string :name
       t.string :all_names
       t.string :symbol
@@ -12,6 +13,7 @@ class CreateSummaries < ActiveRecord::Migration
       t.string :city
       t.string :state
       t.string :zip
+      t.text :subsidiaries, :limit => 16777215
       t.text :owned_by_insider, :limit => 4294967295
       t.text :owned_by_5percent, :limit => 4294967295
       t.text :owner_of_insider, :limit => 4294967295

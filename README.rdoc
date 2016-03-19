@@ -79,7 +79,45 @@ https://www.sec.gov/Archives/edgar/data/61986/0000734269-94-000014.txt
 https://www.sec.gov/Archives/edgar/data/902320/0000950144-94-000447.txt
 ```
 
-=== Methodology:
+=== SEC.5: rake sec:create_summaries
+
+Now that the direct_owners and major_owners collections are populated, we can turn them into summaries, one for each unique owner.
+
+This task creates the empty summary records in the mysql table 'summaries'.
+
+=== SEC.6: rake sec:populate_summaries
+
+Populates the summary fields 'owned_by_insider', 'owned_by_5percent', 'owner_of_insider', 'owner_of_5percent' based on the major-owners and direct_owners collections.
+
+=== SEC.7: rake sec:populate_subsidiaries
+
+Populates summary.subsidiaries, based on CorpWatch's subsidiary data.
+
+When this is finished, the corporate ownership summaries are complete!
+
+Now we move on to campaign finance
+
+=== OS.1: rake sec:opensecrets_create_tables
+
+This must be run three times, specifying a different set of tables to import each time:
+
+1. 527
+2. lobby
+3. campaign
+
+=== OS.2: rake sec:populate_os_summary_donor
+
+OpenSecrets summarization
+
+=== OS.3: rake sec:populate_os_summary_org
+
+OpenSecrets summarization
+
+=== Final: rake sec:import_export
+
+Follow the instructions herein to export the summary data and import it on another server.
+
+= Methodology:
 
 1. Read in Edgar's 'index' files to create the 'forms' MongoDB collection
 2. For each form, download the text data into the forms.txt field
@@ -87,7 +125,7 @@ https://www.sec.gov/Archives/edgar/data/902320/0000950144-94-000447.txt
 4. Create ownership 'summary' entries in MySQL for each company and owner
 5. Populate summaries using owner tables
 
-=== Anticipated questions:
+== Anticipated questions:
 
 Q: Why is it both mongoid and mysql?
 A: There's two types of data: 30 gigs of unstructured weirdness (mongo) and the nicely structured summary data (mongodb, about 300mb).
@@ -95,7 +133,7 @@ A: There's two types of data: 30 gigs of unstructured weirdness (mongo) and the 
 Q: Why is it a Rails app?
 A: Mostly for the Mongoid niceties, and I'm just generally used to them.
 
-=== More detail on the data
+== More detail on the data
 
 This app processes 6 forms:
 
@@ -103,7 +141,6 @@ Forms 3, 4 or 5. These are required to be filed by 'insiders', or employees at a
 
 Forms SC 13D, SC 13G and SC 13G/A. These are required to be filed by anyone who owns 5%+ or more of a given company when they acquire or dispose of shares. These end up in the major_owners collection.
 
-=== Quirks and Inaccuracies
+= Quirks and Inaccuracies
 
-We ignore 'direct owners' for data before 2004 Quarter 4. The reason is, before this date the data is freeform and extremely difficult to parse out.
-
+We ignore 'direct owners' for data before 2004 Quarter 4. The reason is, before this date the data is freeform and extremely difficult to parse out, and nice clean XML afterwards. Realistically employees own very small amount of the company's stock, and employee information from 12+ years ago is likely to be out of date. If they're still employed at the company, it's very likely that their stock ownership has changed since then and thus will appear in our DB.

@@ -25,8 +25,11 @@ class Form
     return fn.gsub(/\.txt$/, "")
   end
 
-  def extract_major_owners
+  def crap_out(*arr)
+    abort arr.inspect
+  end
 
+  def extract_major_owners
     debug_mode = false
 
     sec_header = self.txt.match(/<SEC-HEADER.*?>(.*)<\/SEC-HEADER>/m)
@@ -78,13 +81,14 @@ class Form
           when "CONFIRMING COPY"
             next
           else
-            if debug_mode
-              crap_out("NO OWNERSHIP TABLES (1. name, 11. aggregate, 13. percent)", "lines_txt: #{lines_txt}")
-            else
-              self.status = -8
-              self.save
-              return nil
-            end
+            puts "Unknown header field: #{str}"
+            #if debug_mode
+            #  crap_out("NO OWNERSHIP TABLES (1. name, 11. aggregate, 13. percent)", "lines_txt: #{lines_txt}")
+            #else
+            #  self.status = -8
+            #  self.save
+            #  return nil
+            #end
           end
         end
         if arr.length == 2  # key: val
@@ -156,13 +160,13 @@ class Form
             subject[:business_phone] = val if mode_lvl1 == :subject_company && mode_lvl2 == :business_address
             filer[:business_phone] = val if mode_lvl1 == :filed_by && mode_lvl2 == :business_address
           else
-            if debug_mode
-              crap_out "PARSE SEC HEADER", "Unknown key: " + key + ", val: " + val
-            else
-              self.status = -9
-              self.save
-              return nil
-            end
+            #if debug_mode
+              puts "PARSE SEC HEADER: Unknown key: " + key + ", val: " + val
+            #else
+            #  self.status = -9
+            #  self.save
+            #  return nil
+            #end
           end
         end
         if arr.length > 2
@@ -176,7 +180,6 @@ class Form
       :subject => subject,
       :filer => filer
     }
-
 
     # Strip pdf attachments
     if self.txt.match(/<PDF>/)

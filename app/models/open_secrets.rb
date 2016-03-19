@@ -127,38 +127,500 @@ class OpenSecrets
     end
   end
 
+  def self.create_and_populate_tables(mode, all_cycles)
+    tables_campaign = {
+      "os_candidates" => {
+        "Cycle" => "int",
+        "FECCandID" => 9,
+        "CID" => 9,
+        "FirstLastP" => 50,
+        "Party" => 1,
+        "DistIDRunFor" => 4,
+        "DistIDCurr" => 4,
+        "CurrCand" => 1,
+        "CycleCand" => 1,
+        "CRPICO" => 1,
+        "RecipCode" => 2,
+        "NoPacs" => 1
+      },
+      "os_committees" => {
+        "Cycle" => "int",
+        "CmteID" => 9,
+        "PACShort" => 50,
+        "Affiliate" => 50,
+        "Ultorg" => 50,
+        "RecipID" => 9,
+        "RecipCode" => 2,
+        "FECCandID" => 9,
+        "Party" => 1,
+        "PrimCode" => 5,
+        "Source" => 10,
+        "IsSensitive" => 1, # Renamed because 'Sensitive' is a reserved word
+        "IsForeign" => "int", # Renamed because 'Foreign' is a reserved word
+        "Active" => "int"
+      },
+      "os_pac_to_candidates" => {
+        "Cycle" => "int",
+        "FECRecNo" => 19,
+        "PACID" => 9,
+        "CID" => 9,
+        "Amount" => "float",
+        "Date" => "date",
+        "RealCode" => 5,
+        "Type" => 3,
+        "DI" => 1,
+        "FECCandID" => 9,
+        "status" => "int"
+      },
+      "os_pac_to_pac" => {
+        "Cycle" => "int",
+        "FECRecNo" => 19,
+        "Filerid" => 9,
+        "DonorCmte" => 50,
+        "ContribLendTrans" => 50,
+        "City" => 50,
+        "State" => 2,
+        "Zip" => 5,
+        "FECOccEmp" => 38,
+        "Primcode" => 5,
+        "DateOf" => "date", # Renamed from Date
+        "Amount" => "float",
+        "RecipID" => 9,
+        "Party" => 1,
+        "Otherid" => 9,
+        "RecipCode" => 2,
+        "RecipPrimCode" => 5,
+        "Amend" => 1,
+        "Report" => 3,
+        "PG" => 1,
+        "Microfilm" => 11,
+        "Type" => 3,
+        "RealCode" => 5,
+        "Source" => 5,
+        "status" => "int"
+      },
+      "os_individual" => {
+        "Cycle" => "int",
+        "FECTransId" => 19,
+        "ContribID" => 12,
+        "Contrib" => 50,
+        "RecipID" => 9,
+        "Orgname" => 50,
+        "UltOrg" => 50,
+        "RealCode" => 5,
+        "DateOf" => "date",
+        "Amount" => "int",
+        "Street" => 40,
+        "City" => 30,
+        "State" => 2,
+        "Zip" => 5,
+        "RecipCode" => 2,
+        "Type" => 3,
+        "CmteID" => 9,
+        "OtherID" => 9,
+        "Gender" => 1,
+        "Microfilm" => 11,
+        "Occupation" => 50,
+        "Employer" => 50,
+        "Source" => 5,
+        "status" => "int"
+      },
+    }
+
+    tables_lobby = {
+      "os_lobby_agency" => {
+        "Uniqid" => 36,
+        "AgencyID" => 3,
+        "Agency" => 80
+      },
+      "os_lobby_bills" => {
+        "B_ID" => "int",
+        "SI_ID" => "int",
+        "CongNo" => 3,
+        "Bill_Name" => 15
+      },
+      "os_lobby_industries" => {
+        "Client" => 50,
+        "Sub" => 50,
+        "Total" => "float",
+        "Year" => 4,
+        "Catcode" => 5
+      },
+      "os_lobby_issues" => {
+        "S_ID" => "int",
+        "Uniqid" => 36,
+        "IssueID" => 3,
+        "Issue" => 50,
+        "SpecificIssue" => 512,
+        "Year" => 4
+      },
+      "os_lobby_issues_nonspecific" => {
+        "S_ID" => "int",
+        "Uniqid" => 36,
+        "IssueID" => 3,
+        "Issue" => 50,
+        "Year" => 4
+      },
+      "os_lobby_lobbying" => {
+        "Uniqid" => 36,
+        "Registrant_raw" => 110,
+        "Registrant" => 50,
+        "Isfirm" => 1,
+        "Client_raw" => 110,
+        "Client" => 50,
+        "Ultorg" => 50,
+        "Amount" => "float",
+        "Catcode" => 5,
+        "Source" => 5,
+        "Self" => 1,
+        "IncludeNSFS" => 1,
+        "UseCode" => 1,
+        "Ind" => 1,
+        "Year" => 4,
+        "Type" => 4,
+        "Typelong" => 80,
+        "Affiliate" => 1,
+        "status" => "int"
+      },
+      "os_lobby_lobbyists" => {
+        "UniqID" => 36,
+        "Lobbyist_raw" => 50,
+        "Lobbyist" => 50,
+        "Lobbyist_id" => 12,
+        "Year" => 4,
+        "OfficialPosition" => 100,
+        "CID" => 15,
+        "Formercongmem" => 1,
+      },
+      "os_lobby_report_types" => {
+        "type" => 50,
+        "code" => 4,
+      },
+    }
+
+    tables_527 = {
+      "os_527_committies" => {
+        "Cycle" => 4,
+        "Rpt" => 4,
+        "EIN" => 9,
+        "CRP527Name" => 40,
+        "Affiliate" => 40,
+        "UltOrg" => 40,
+        "RecipCode" => 2,
+        "CmteID" => 9,
+        "CID" => 9,
+        "ECCmteID" => 10,
+        "Party" => 1,
+        "PrimCode" => 5,
+        "Source" => 10,
+        "FFreq" => 1,
+        "Ctype" => 10,
+        "CSource" => 5,
+        "ViewPt" => 1,
+        "Comments" => 250,
+        "State" => 2
+      },
+      "os_527_contribution" => {
+        "CRP_ID" => "int",
+        "Rpt" => 4,
+        "FormID" => 38,
+        "SchAID" => 38,
+        "ContribID" => 12,
+        "Contrib" => 50,
+        "Amount" => "float",
+        "Date" => "date",
+        "Orgname" => 50,
+        "UltOrg" => 50,
+        "RealCode" => 5,
+        "RecipID" => 9,
+        "RecipCode" => 2,
+        "Party" => 1,
+        "Recipient" => 50,
+        "City" => 50,
+        "State" => 2,
+        "Zip" => 5,
+        "Zip4" => 4,
+        "PMSA" => 4,
+        "Employer" => 70,
+        "Occupation" => 70,
+        "YTD" => 17,
+        "Gender" => 1,
+        "Source" => 5,
+        "status" => "int"
+      },
+      "os_527_expenditure" => {
+        "Rpt" => 4,
+        "FormID" => 38,
+        "SchBID" => 38,
+        "Orgname" => 70,
+        "EIN" => 9,
+        "Recipient" => 50,
+        "RecipientCRP" => 50,
+        "Amount" => "int",
+        "Date" => "date",
+        "ExpCode" => 3,
+        "Source" => 5,
+        "Purpose" => 512,
+        "Addr1" => 50,
+        "Addr2" => 50,
+        "City" => 50,
+        "State" => 2,
+        "Zip" => 5,
+        "Employer" => 70,
+        "Occupation" => 70
+      },
+    }
+
+    tables_expenditure = {
+      "os_finances_agreements" => {
+        "Rpt" => 4,
+        "FormID" => 38
+        },
+    }
+
+    files_campaign = {
+      "os_candidates" => "cands",
+      "os_committees" => "cmtes",
+      "os_pac_to_candidates" => "pacs",
+      "os_pac_to_pac" => "pac_other",
+      "os_individual" => "indivs"
+    }
+
+#      "os_lobby_agency" => "lob_agency",
+#      "os_lobby_bills" => "lob_bills",
+#      "os_lobby_issues" => "lob_issue",
+    #  "os_lobby_report_types" => "lob_rpt",
+    #  "os_lobby_issues_nonspecific" => "lob_issue_NoSpecficIssue",
+    #  "os_lobby_lobbying" => "lob_lobbying",
+    #  "os_lobby_lobbyists" => "lob_lobbyist",
+
+    # We only use lobby_industries for the summaries
+    files_lobby = {
+      "os_lobby_industries" => "lob_indus"
+    }
+
+    #  "os_527_committees" => "cmtes527",
+    #  "os_527_expenditure" => "expends527",
+    files_527 = {
+      "os_527_contribution" => "rcpts527"
+    }
+
+    case mode
+    when "campaign"
+      tables = tables_campaign
+      files = files_campaign
+    when "lobby"
+      tables = tables_lobby
+      files = files_lobby
+    when "527"
+      tables = tables_527
+      files = files_527
+    end
+
+    # Drop and create tables
+    tables_fields = {}
+    tables.each do |tbl, fields|
+      next unless files[tbl]
+
+      tables_fields[tbl] = []
+
+      sql = "DROP TABLE IF EXISTS #{tbl}"
+      puts sql
+      #Db.exec_sql(sql)
+
+      sql = "CREATE TABLE IF NOT EXISTS #{tbl} (id INT NOT NULL AUTO_INCREMENT, "
+      fields.each_with_index do |fld, i|
+        typ = fld[1]
+        fld = fld[0]
+
+        tables_fields[tbl] << fld
+
+        sql += "#{fld} "
+        if typ.is_a?(Fixnum) # Number
+          sql += " VARCHAR(#{typ})"
+        else
+          sql += typ
+        end
+        if i == fields.size - 1
+          sql += ", PRIMARY KEY (id))"
+        else
+          sql += ", "
+        end
+      end
+
+      if mode == "campaign" && tbl == "os_individual"
+        # Create tables, sharded by year
+        all_cycles.each do |year|
+          puts sql
+          Db.exec_sql(sql.gsub("os_individual", "os_individual_" + year))
+        end
+      else
+        puts sql
+        Db.exec_sql(sql)
+      end
+
+    end
+
+    str = ""
+
+    case mode
+    when "campaign"
+      years = all_cycles
+    else
+      years = [ true ]
+    end
+
+    ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')
+
+    files.each do |tbl, filename|
+      cnt = 0
+      years.each do |year|
+        puts "== Year: #{year}"
+        arr_fields = tables_fields[tbl]
+
+        case mode
+        when "campaign"
+          fullpath = "data/opensecrets/#{mode}/#{filename}#{year}.txt"
+        else
+          fullpath = "data/opensecrets/#{mode}/#{filename}.txt"
+        end
+        puts "==== Processing file: #{fullpath}"
+        #skip_all = true
+        file = File.open("#{fullpath}")
+        while cur_line = file.gets
+
+          cur_line_before = cur_line
+
+          cur_line = ic.iconv(cur_line)
+          cur_line = cur_line.gsub(/"/, "`")
+          cur_line = cur_line.gsub(/'/, "`")
+          while cur_line.match(/,,/)
+            cur_line = cur_line.gsub(/,,/, ',||,')
+          end
+          cur_line = cur_line.gsub(/\|,(\d\d)\/(\d\d)\/(\d\d\d\d),(-?)(\d+),\|/, "|,|\\1/\\2/\\3|,|\\4\\5|,|")
+          cur_line = cur_line.gsub(/^\|/, '"')
+          cur_line = cur_line.gsub(/\|\s+$/, '"')
+          cur_line = cur_line.gsub(/\|,\|/, '","')
+          cur_line = cur_line.gsub(/\|,/, '",')
+          cur_line = cur_line.gsub(/,\|/, ',"')
+          #cur_line = cur_line.gsub(/(\d)/, "\\1")
+
+          cnt += 1
+          if cnt % 10000 == 0
+            puts "== line: #{cnt}"
+          end
+
+          begin
+            # There are occasional errors in CSV, ignore the whole line but log the error
+            values = CSV.parse(cur_line)
+          rescue => ex
+            puts "Error at line: #{cnt}: #{ex.inspect} -- #{values.inspect}"
+            next
+          end
+          values = values[0]
+
+          # ==== If you need to restart the process due to memory going away
+          #fec_trans_id = values[1] || ""
+          #if fec_trans_id.to_i < 1881212
+          #  next
+          #end
+
+          rec = {}
+
+          tbl_cur = tbl
+          tbl_cur += "_" + year if mode == "campaign" && filename == "indivs"
+
+          sql = "INSERT INTO #{tbl_cur} ("
+          sql_fld = sql_val = ""
+          (0..values.length - 1).each do |i|
+            key = arr_fields[i]
+            val = values[i]
+            if val.nil?
+              val = ""
+            else
+              #val = ic.iconv(val + ' ')[0..-2]
+              val = val.gsub(/'/, '`')
+              val = val.gsub(/\\+$/, "")
+              val = val.gsub(/^\s+/, "")
+              val = val.gsub(/\s+$/, "")
+
+              # MM/DD/YYYY -> YYYY-MM-DD
+              if val.match(/^\d\d\/\d\d\/\d\d\d\d$/)
+                arr = val.split(/\//)
+                val = arr[2] + '-' + arr[0] + '-' + arr[1]
+              end
+            end
+
+            # Occasionally the date is missing in the OpenSecrets data. Defaults to 1/1/#{year} so the data can still make it to the summary.
+            if val == ''
+              field_type = tables[tbl][key]
+              if field_type == 'date'
+                if mode == 'campaign'
+                  val = "#{year2to4(year)}-1-1"
+                elsif mode == '527'
+                  rpt = values[1]  # Rpt field
+                  yr = rpt.slice(2, 2)
+                  qtr = rpt.slice(1, 1).to_i
+                  month = (qtr * 3) - 2
+                  val = "#{year2to4(yr)}-#{month}-1"
+                end
+                puts "Default DATE: #{val}"
+              end
+            end
+
+            sql_fld += "#{key}"
+            if i != values.length - 1
+              sql_fld += ", "
+            end
+
+            sql_val += "'#{val}'"
+            if i != values.length - 1
+              sql_val += ", "
+            end
+
+          end
+
+          sql = "#{sql} #{sql_fld}) VALUES (#{sql_val})"
+#abort sql
+          begin
+            Db.exec_sql(sql)
+          rescue => ex
+            puts "
+Error inserting record: #{cnt}: #{ex.inspect} -- #{values.inspect}
+
+Before:
+
+#{cur_line_before}
+
+After:
+#{cur_line}
+"
+          end
+        end
+      end # year
+    end
+
+  end
+
   # ====== ====== ====== ====== ====== ====== ====== ====== ======
   # ====== STEP 1: Create os_summary_donor records
   # ====== ====== ====== ====== ====== ====== ====== ====== ======
-  def self.prepare_os_summary_donor
+  def self.prepare_os_summary_donor(all_cycles)
     # This should take about 2 hours
 
     start = Time.now
 
-    DB::log_time(start, "To see progress: SELECT count(id) FROM `os_summary_donors`")
-    DB::log_time(start, "== INDEXES: CREATE UNIQUE INDEX contribid_index ON os_summary_donors (ContribID)")
-    DB::log_time(start, "== STOP SOLR: bundle exec rake sunspot:solr:stop RAILS_ENV=development  AND  comment it out in os_summary_donors")
-    DB::log_time(start, "start")
-
-    db_ver = "os_indiv_1n"
-
-    unless $redis.exists(db_ver)
-      $redis.set(db_ver, 1)
-
-      sql = "DELETE FROM os_summary_donors"
-      Db.exec_sql(sql)
-      #sql = "UPDATE os_individual SET status = 0 WHERE status = 1"
-      #Db.exec_sql(sql)
-    end
-
-    DB::log_time(start, "after del")
+    Db::log_time(start, "To see progress: SELECT count(id) FROM `os_summary_donors`")
+    Db::log_time(start, "== INDEXES: CREATE UNIQUE INDEX contribid_index ON os_summary_donors (ContribID)")
+    Db::log_time(start, "== STOP SOLR: bundle exec rake sunspot:solr:stop RAILS_ENV=development  AND  comment it out in os_summary_donors")
+    Db::log_time(start, "start")
 
     # Total distinct donors: SELECT count(distinct(contribId)) FROM `os_individual_00` WHERE 1
 
     # Create empty OsSummaryDonor records, one for each ContribId, a unique identifier for each individual contributor
     # First create records of all the 2016 donors, then 2014 etc
-    [ "16", "14", "12", "10", "08", "06", "04", "02", "00", "98", "96", "94", "92", "90" ].each do |year|
-      DB::log_time(start, "year #{year}")
+    all_cycles.each do |year|
+      Db::log_time(start, "year #{year}")
       num_batch = 100000
       page = 0
       cnt = 0
@@ -172,7 +634,7 @@ class OpenSecrets
           LIMIT 0, #{num_batch}
         "
         # LIMIT #{page * num_batch}, #{num_batch}
-        DB::log_time(start, "=== prepare start: \n#{sql}")
+        Db::log_time(start, "=== prepare start: \n#{sql}")
 
         rows = Db.get_rows(sql)
         keep_going = rows.length > 1
@@ -180,7 +642,7 @@ class OpenSecrets
         Rails.logger.warn Time.new.inspect + " == prepare GO"
         rows.each do |indiv|
           if cnt % 10000 == 0
-            DB::log_time(start, "=== prepare row #{cnt}")
+            Db::log_time(start, "=== prepare row #{cnt}")
           end
           cnt += 1
           sql = "
@@ -208,34 +670,20 @@ class OpenSecrets
 
     end
 
-    DB::log_time(start, "done")
+    Db::log_time(start, "done")
   end
 
   # ====== ====== ====== ====== ====== ====== ====== ====== ======
   # ====== STEP 2: Populate os_summary_donor records with data
   # ====== ====== ====== ====== ====== ====== ====== ====== ======
-  def self.populate_os_summary_donor
+  def self.populate_os_summary_donor(all_cycles)
     # This took about 30 hours to run for me. You can start/stop it as necessary, it will restart.
 
     start = Time.now
 
-    # CREATE INDEX contribid_index ON os_individual_90 (ContribID)
-    DB::log_time(start, "Process_opensecrets")
-    DB::log_time(start, "To see progress: SELECT count(id) FROM `os_summary_donors` WHERE dollar_total != -1")
-    DB::log_time(start, "INDEXES: contrib_id on os_individual_**")
+    Db::log_time(start, "Process_opensecrets")
 
     # ALTER TABLE  `os_summary_donors` ADD UNIQUE ( `contrib_id` )
-
-    db_ver = "os_donor_sum_1m"
-
-    unless $redis.exists(db_ver)
-
-      $redis.set(db_ver, 1)
-
-      sql = "UPDATE os_summary_donors SET dollar_total = -1"
-      DB::log_time(start, "RESET: #{sql}")
-      Db.exec_sql(sql)
-    end
 
     sql = "
       SELECT CmteID, PACShort, Ultorg, RecipCode, PrimCode
@@ -243,7 +691,7 @@ class OpenSecrets
       GROUP BY CmteID
       ORDER BY cycle DESC
       "
-    DB::log_time(start, "COMMITTEES: #{sql}")
+    Db::log_time(start, "COMMITTEES: #{sql}")
     rows = Db.get_rows(sql)
     committees = {}
     rows.each do |cmte|
@@ -264,7 +712,7 @@ class OpenSecrets
       FROM os_candidates
       ORDER BY cycle DESC
       "
-    DB::log_time(start, "CANDIDATES: #{sql}")
+    Db::log_time(start, "CANDIDATES: #{sql}")
     candidates = Db.get_rows(sql)
 
     # Read summary ids/contrib_ids in batches
@@ -273,7 +721,7 @@ class OpenSecrets
     cnt = 0
     keep_going = true
 
-    DB::log_time(start, "Starting")
+    Db::log_time(start, "Starting")
 
     while keep_going
       sql = "
@@ -283,13 +731,13 @@ class OpenSecrets
         LIMIT 0, #{num_batch}
       " # #   {num_batch * page} 
       donors = Db.get_rows(sql)
-      DB::log_time(start, "donors: #{donors}")
+      Db::log_time(start, "donors: #{donors}")
 
       page += 1
 
       keep_going = donors.length > 1
 
-      DB::log_time(start, "Start batch: #{page * num_batch}\n#{donors[0].inspect}")
+      Db::log_time(start, "Start batch: #{page * num_batch}\n#{donors[0].inspect}")
 
       abort "Done!" unless keep_going
 
@@ -319,7 +767,7 @@ class OpenSecrets
         dollar_other_ideological = 0
         dollar_other_other = 0
 
-        [ "90", "92", "94", "96", "98", "00", "02", "04", "06", "08", "10", "12", "14", "16" ].each do |year|  # For each year of info we ave
+        all_cycles.each do |year|  # For each year of info we ave
 
           # Retrieve all donations by that contributor for that year, group by recipients and get the SUM of the amounts to that recip
           #   ToDo: this dedupes, should see if it's necessary: group by committee_id + "_" + cast(date as char) + "_" + cast(amount as char)  -- ToDo: should we omit dupes this way?
@@ -332,7 +780,7 @@ class OpenSecrets
           " # Group By essentially groups all donations by year
           donations = Db.get_rows(sql)
           if donations.length == 0
-            #DB::log_time(start, "No donors found")
+            #Db::log_time(start, "No donors found")
             next
           end
 
@@ -340,8 +788,8 @@ class OpenSecrets
           donations.each_with_index do |donation, i|
 
             if cnt % 1000 == 0
-              DB::log_time(start, "prepare row #{cnt}")
-              DB::log_time(start, "Donor: #{donor_summary_id} #{contrib_id}")
+              Db::log_time(start, "prepare row #{cnt}")
+              Db::log_time(start, "Donor: #{donor_summary_id} #{contrib_id}")
             end
             cnt += 1
 
@@ -459,7 +907,7 @@ class OpenSecrets
           WHERE id = '#{donor_summary_id}'
         "
         Db.exec_sql(sql)
-        DB::log_time(start, "Update: #{donor_summary_id}")
+        Db::log_time(start, "Update: #{donor_summary_id}")
       end # /donor
     end # / keep_going
   end
@@ -473,27 +921,7 @@ class OpenSecrets
 
     start = Time.now
 
-    db_ver = "os_org_sum_2d"
-
-    DB::log_time(start, "starting. Progress: rails c & OsSummaryOrg.count")
-
-
-    # CREATE INDEX orgname_index ON os_summary_donors (orgname)
-    # CREATE INDEX sub_index ON os_lobby_industries (Sub)
-    # CREATE INDEX ultorg_index ON os_committees (Ultorg)
-    # CREATE INDEX pacid_index ON os_pac_to_candidates (PACID)
-    # CREATE INDEX otherid_index ON os_pac_to_pac (Otherid)
-    # CREATE INDEX filerid_index ON os_pac_to_pac (Filerid)
-    # CREATE INDEX orgname_index ON os_527_contribution (orgname)
-
-    unless $redis.exists(db_ver)
-      $redis.set(db_ver, 1)
-
-      sql = "DELETE FROM os_summary_orgs"
-      Db.exec_sql(sql)
-    end
-
-    DB::log_time(start, "Starting")
+    Db::log_time(start, "starting. Progress: rails c & OsSummaryOrg.count")
 
     # ==== Load all committees and candidates into memory, indexed by their primary key id
     sql = "
@@ -539,10 +967,10 @@ class OpenSecrets
         WHERE #{where}
         LIMIT 0, 5000
         "
-      DB::log_time(start, "Get 5000 orgs START")
+      Db::log_time(start, "Get 5000 orgs START")
       rows = Db.get_rows(sql)
       keep_going = rows.length > 0 
-      DB::log_time(start, "Get 5000 orgs END")
+      Db::log_time(start, "Get 5000 orgs END")
 
       cnt = 0
       # ==== For each organization we have records for...
@@ -754,7 +1182,7 @@ class OpenSecrets
         dollar_other = 0
 
         ## Get all dollar totals
-        #DB::log_time(start, "get SUMS")
+        #Db::log_time(start, "get SUMS")
         sql = "
           SELECT
             SUM(dollar_cand_repub) AS dollar_cand_repub,
@@ -791,17 +1219,17 @@ class OpenSecrets
           }
         end
         totals = totals.merge(sums)
-        #DB::log_time(start, "Get Sums END")
+        #Db::log_time(start, "Get Sums END")
 
         ## Get top X donors from each category
-        #DB::log_time(start, "Get Donors START")
+        #Db::log_time(start, "Get Donors START")
         sql = "
           SELECT donations_cand, donations_party, donations_other
           FROM os_summary_donors
           WHERE orgname = '#{orgname}'
         "
         donors = Db.get_rows(sql)
-        #DB::log_time(start, "Get Donors END")
+        #Db::log_time(start, "Get Donors END")
 
         ## Get the 'top of the top' donors for this organization
         donations_cand = []

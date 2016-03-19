@@ -54,20 +54,12 @@ class SecProcess
       '0001381870-11-000004', # bad sec header
     ]
 
-    # AND form_type LIKE 'SC 13%'
-    #status = 1 AND 
-    #.order("date_filed DESC")
-    # AND form_type = 'SC 13D'
-
-    puts "004"
-    puts "== Warning: sorting all this data in memory takes FOREVER. Please give it at least 30mins."
     forms = Form.where( { status: 1, year: year, quarter: quarter }).order_by(:date_filed => :desc)
     if forms.length == 0 || forms.length == 1
       puts "done"
       return true
     end
 
-    puts "006"
     forms.each do |form|
       #abort form.inspect
       puts("== Form: #{form.id} == #{form.date_filed} == ")
@@ -118,11 +110,33 @@ class SecProcess
       # SC* forms
       #
       ###############
+
+
+      #Statuses:
+      #0
+      #1
+      #5
+      #-1 => 0
+      #-2 => 0,
+      #-3 => 0,
+      #-4 => 0,
+      #-5 => 0,
+      #-7 => 0,
+      #-8 => 0,
+      #-9 => 0,
+      #-10 => 0,
+      #-11 => 0,
+      #-15 => 0,
+      #-17 => 0,
+
       case form.form_type
       when /^SC /
         obj = form.extract_major_owners
         if obj.nil?  # An error occured and this one must be skipped
           next
+        end
+        if form.status < 0
+          abort form.status.inspect
         end
 
         header = obj[:header]
@@ -374,6 +388,15 @@ class SecProcess
     end
 
     puts "007 Done!"
+
+    status_stats = {}
+    forms = Form.where( { status: 1, year: year, quarter: quarter }).order_by(:date_filed => :desc)
+    forms.each do |form|
+      status_stats[form.status] ||= 0
+      status_stats[form.status] += 1
+    end
+
+    puts "Stats: \n\n#{MultiJson.dump(status_stats)}"
     return true
 
   end
@@ -530,25 +553,6 @@ class SecProcess
   end
 
   def self.populate_summaries(bypass)
-
-    # I add these manually in robomongo when I get to this step, easier than using mongoid
-
-    # Index required: subj_sec_date
-    #{
-    #    "subject_cik": 1,
-    #    "security_title": 1,
-    #    "date_filed" : -1
-    #}
-
-    # Index required: issuer_sec_direct_per
-    #{
-    #    "issuer_cik": 1,
-    #    "security_title": 1,
-    #    "is_direct_owner" : 1,
-    #    "period_of_report" : -1
-    #}
-
-    # With above indexes, should take maybe 4 hours
 
     puts "========================"
     puts "= Populating summaries    "

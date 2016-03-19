@@ -1,34 +1,22 @@
 class CorpWatch
 
   def self.cw_to_summary_go
-
-    db_ver = "cw_summ_1f"
-
-    unless $redis.exists(db_ver)
-      $redis.set(db_ver, 1)
-
-      sql = "UPDATE summaries SET subsidiaries = ''"
-      Db.exec_sql(sql)
-    end
-
     summaries = Summary.find_by_sql("
       SELECT id, cik, subsidiaries, cw_id, name
       FROM summaries
       WHERE subsidiaries = ''
-      LIMIT 0, 1000000000
     ")
-    summaries.each do |summary|
-      #abort summary.inspect
-    end
 
     # For each summary
+    cnt = 0
     summaries.each do |summary|
-      puts summary.name
+      cnt += 1
+      puts "Processing ##{cnt}: #{summary.inspect}" if cnt % 100 == 0
       @hsh_found = {}
 
       subsidiaries = []
 
-      cw_id = DB::cik_to_cw_id(summary['cik'])
+      cw_id = Db::cik_to_cw_id(summary['cik'])
       begin
         hsh_summaries = get_children(cw_id)
       rescue Exception => ex
