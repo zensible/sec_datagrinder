@@ -1,6 +1,11 @@
 = SEC DataGrinder
 
-This application downloads corporate ownership data from the SEC's Edgar web app and processes it into a summary. I believe it is the most complete corporate ownership database available for free.
+This application downloads corporate ownership data from the SEC's Edgar web app and processes it into summaries by company.
+
+Here's what all it does:
+
+1. Downloads list of all forms submitted to the SEC starting at 1990
+2. Download all ownership forms (SEC form SC-13D, SC-13G, 3, 4 and 5)
 
 == Installation
 
@@ -15,9 +20,8 @@ http://www.sequelpro.com/download
 http://app.robomongo.org/download.html
 ```
 
-1. Install redis, any version should work, author used 2.8.13: http://redis.io/download
-2. Install mysql. Any version should work, author used 5.5: https://dev.mysql.com/downloads/mysql/
-3. Install mongodb, author used 3.0.8: https://www.mongodb.org/downloads#production
+1. Install mysql. Any version should work, author used 5.5: https://dev.mysql.com/downloads/mysql/
+2. Install mongodb, author used 3.0.8: https://www.mongodb.org/downloads#production
 
 Make sure you have *plenty* of hard drive space available wherever you install mysql/mongodb, I'd budget at least 200gb if you're processing all the available data.  The more RAM you have the faster it will go, 16GB is probably the bare minimum.
 

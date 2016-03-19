@@ -8,7 +8,6 @@ gem 'mysql2', '< 0.4'
 
 gem 'titleize'
 gem 'haml'
-gem 'redis'
 gem 'nokogiri'
 gem 'typhoeus'
 gem 'execjs'
